@@ -14,7 +14,7 @@ class BlocProvider<T extends BlocBase> extends StatefulWidget {
   }) : super(key: key);
 
   final Widget child;
-  final List<T> bloc;
+  final T bloc;
 
   @override
   _BlocProviderState<T> createState() => _BlocProviderState<T>();
@@ -25,19 +25,6 @@ class BlocProvider<T extends BlocBase> extends StatefulWidget {
   /// 查找复杂度底的原因源于 Fluter Framework 缓存了所有 InheritedWidgets 才得以实现。
   ///
   static T of<T extends BlocBase>(BuildContext context) {
-    List<T> blocs = ofBlocs<T>(context);
-
-    if (blocs != null && blocs.length > 0) {
-      blocs.forEach((b) {
-        if (b.runtimeType == T.runtimeType) {
-          return b;
-        }
-      });
-    }
-    return null;
-  }
-
-  static List<T> ofBlocs<T extends BlocBase>(BuildContext context) {
     final type = _typeOf<_BlocProviderInherited<T>>();
 
     ///
@@ -54,9 +41,7 @@ class BlocProvider<T extends BlocBase> extends StatefulWidget {
 class _BlocProviderState<T extends BlocBase> extends State<BlocProvider<T>> {
   @override
   void dispose() {
-    widget.bloc.map((bloc) {
-      bloc.dispose();
-    });
+    widget.bloc?.dispose();
     super.dispose();
   }
 
@@ -76,7 +61,7 @@ class _BlocProviderInherited<T> extends InheritedWidget {
     @required this.bloc,
   }) : super(key: key, child: child);
 
-  final List<T> bloc;
+  final T bloc;
 
   @override
   bool updateShouldNotify(_BlocProviderInherited oldWidget) => false;
